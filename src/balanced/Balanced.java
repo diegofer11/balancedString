@@ -1,72 +1,96 @@
 package balanced;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import java.util.*;
 
 public class Balanced {
-    private static final Logger log = Logger.getLogger("Balanced");
-    
     public static void main(String[] args) {
-        List<String> test1 = Arrays.asList("]", "(");
-        boolean respTest1 = validarCadena(test1);
-        log.info(String.format("resultado test1::: %s", respTest1)); //FALSE
-        
-        List<String> test2 = Arrays.asList("(", "{", "[", "]", "}", ")");
-        boolean respTest2 = validarCadena(test2);
-        log.info(String.format("resultado test2::: %s", respTest2)); //TRUE
-        
-        List<String> test3 = Arrays.asList("(", "{", "[", ")", "}", ")");
-        boolean respTest3 = validarCadena(test3);
-        log.info(String.format("resultado test3::: %s", respTest3)); //FALSE
-    
-        List<String> test4 = Arrays.asList("**", "{", "[", ")", "}", ")");
-        boolean respTest4 = validarCadena(test4);
-        log.info(String.format("resultado test4::: %s", respTest4)); //FALSE
-    
-        List<String> test5 = Arrays.asList("{", "[", "]", "}");
-        boolean respTest5 = validarCadena(test5);
-        log.info(String.format("resultado test5::: %s", respTest5)); //TRUE
-    }
-    
-    private static boolean validarCadena(List<String> cadena) {
-        /*
-        Se crea un mapa con los pares de símbolos Key = apertura, Value = cierre
-         */
-        Map<String, String> dictCombinaciones = new HashMap<>();
-        dictCombinaciones.put("(", ")");
-        dictCombinaciones.put("{", "}");
-        dictCombinaciones.put("[", "]");
-        
-        if (cadena.size() % 2 != 0) {
-            return false;
-        }
-        /*
-          Se crea un objeto de tipo Cola que únicamente almacena el elemento de cierre, ), }, ] asociado al
-          elemento encontrado, p.ej, si el primer elemento es {, result guardará }
-         */
-        Deque<String> result = new ArrayDeque<>();
-        for (String simbolo : cadena) {
-            /**
-             * La comparación se hace con el Key del diccionario y la cola almacena el Value.
-             */
-            if (dictCombinaciones.containsKey(simbolo)) {
-                /**
-                 * Guarda el value, o elemento de cierre en la Cola.
-                 */
-                result.push(dictCombinaciones.get(simbolo));
-                /*
-                  Se retorna false si el elemento actual no existe en el diccionario.
-                  La instrucción "pop" quita el primer elemento de la cola y lo compara con el elemento actual.
-                 */
-            } else if (result.isEmpty() || ! result.pop().equals(simbolo)) {
-                return false;
+        // EJERCICIO 1
+        for (int idx = 1; idx <= 20; idx++) {
+            if (idx % 3 == 0 && idx % 5 == 0) {
+                System.out.println("fizzbuzz");
+            } else if (idx % 5 == 0) {
+                System.out.println("buzz");
+            } else if (idx % 3 == 0) {
+                System.out.println("fizz");
+            } else {
+                System.out.println(idx);
             }
         }
-        return result.isEmpty();
+
+        //EJERCICIO 2
+        Set<Integer> chars = new HashSet<>();
+        String s = "El viejo Señor Gómez pedía queso, kiwi y habas, pero le ha tocado un saxo.".toLowerCase();
+        s = s.replace("ñ", "n");
+        s = s.replace("ó", "o");
+        s = s.replace("í", "i");
+        s = s.replace("û", "u");
+        s = s.replace(".", "");
+        s = s.replace(",", "");
+        s = s.replace(" ", "");
+        boolean b = s.length() > 25 && s.chars()
+                .filter(i -> i >= 'a' && i <= 'z') //only alphabet
+                .filter(chars::add)                //add to our tracking set if we reach this point
+                .filter(i -> chars.size() == 26)   //filter the 26th letter found
+                .findAny().isPresent();
+        System.out.println("el texto:::" + s + " es:" + b);
+
+        //EJERCICIO 3
+        Car car1 = new Car("Ford", "EcoSport", "2020", "A123");
+        Car car2 = new Car("Audi", "Q2", "2021", "A124");
+        Car car3 = new Car("Ford", "Aspire", "2021", "A125");
+        Car car4 = new Car("Audi", "Q2", "2021", "A124");
+
+        List<Car> cars = new ArrayList<>();
+        cars.add(car1);
+        cars.add(car2);
+        cars.add(car3);
+        cars.add(car4);
+
+        Set<String> uniqueMakes = new HashSet<>();
+        cars.forEach(c -> {
+            if (uniqueMakes.contains(c.getMake())) {
+                uniqueMakes.remove(c.getMake());
+            } else {
+                uniqueMakes.add(c.getMake());
+            }
+        });
+
+        System.out.println("unique makes:::" + uniqueMakes);
+
+        //EJERCICIO 4
+        Random random = new Random();
+
+        int[] array = random.ints(20, 10, 100).toArray();
+        System.out.println(Arrays.toString(array));
+        quickSort(array, 0, array.length - 1);
+        System.out.println(Arrays.toString(array));
+
+    }
+
+    public static void quickSort(int[] arr, int start, int end) {
+        if (start < end) {
+            int partitionIndex = partition(arr, start, end);
+            quickSort(arr, start, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+    }
+
+    private static int partition(int[] arr, int start, int end) {
+        int pivot = arr[end];
+        int i = start - 1;
+
+        for (int j = start; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                int swapTemp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = swapTemp;
+            }
+        }
+
+        int swapTemp = arr[i + 1];
+        arr[i + 1] = arr[end];
+        arr[end] = swapTemp;
+        return i + 1;
     }
 }
